@@ -13,7 +13,7 @@ server.get('/',(req,res)=>{
 server.post('/salud',(req,res)=>{
     let context;
     let result;
-    let opciones = [""];
+    let opciones = ["Prueba"];
     try {
         context = req.body.queryResult.action;
         textoEnviar = `Recibida petición de acción: ${context}`;
@@ -34,7 +34,7 @@ server.post('/salud',(req,res)=>{
             if(!tos){
               textoEnviar = "¿Tienes tos?"
               opciones = ["Si", "No"];
-              resultado = dialog.webhookResponse(textoEnviar)
+              result = dialog.webhookResponse(textoEnviar)
             }else if(!fiebre){
               textoEnviar = "¿Tienes fiebre?"
               opciones = ["Si", "No"];
@@ -55,6 +55,7 @@ server.post('/salud',(req,res)=>{
     } catch (error) {
         console.log("Error contexto vacio: ", error);
     }    
+    dialog.addOptions(result,opciones);
     res.json(result);
 })
 

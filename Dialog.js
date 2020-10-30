@@ -64,9 +64,24 @@ function respuestaInicial(texto1, texto2){
       ],   
   }
   return respuesta;
-
+}
+function addOptions(res,opciones){  
+  res.fulfillmentMessages.push( {
+    "platform": "ACTIONS_ON_GOOGLE",
+    "suggestions": {
+      "suggestions": optionList(opciones)
+    }
+  }); 
+}
+function optionList(opciones){
+  let res = [];
+  for (let i = 0; i < opciones.length; i++) {
+    res.push({"title": opciones[i]});
+  }
+  return res;
 }
 module.exports = {
   webhookResponse: webhookResponse,
-  respuestaInicial: respuestaInicial
+  respuestaInicial: respuestaInicial,
+  addOptions: addOptions
 };
