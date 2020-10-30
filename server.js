@@ -13,7 +13,7 @@ server.get('/',(req,res)=>{
 server.post('/salud',(req,res)=>{
     let context;
     let result;
-    let opciones = [];
+    let opciones = [""];
     try {
         context = req.body.queryResult.action;
         textoEnviar = `Recibida petición de acción: ${context}`;
@@ -54,8 +54,7 @@ server.post('/salud',(req,res)=>{
           }
     } catch (error) {
         console.log("Error contexto vacio: ", error);
-    }
-    res.status(200);
+    }    
     res.json(result);
 })
 

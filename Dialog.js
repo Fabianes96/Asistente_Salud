@@ -1,4 +1,4 @@
-function webhookResponse(text){
+function webhookResponse(text) {
   let respuesta = {
     "fulfillmentText": text,
     "fulfillmentMessages": [
@@ -46,17 +46,7 @@ function respuestaInicial(texto1, texto2){
               }
             ]
           }
-        },
-        {
-          "platform": "ACTIONS_ON_GOOGLE",
-          "simpleResponses": {
-            "simpleResponses": [
-              {
-                "textToSpeech": texto1
-              }
-            ]
-          }
-        },
+        },        
         {
           "text": {
             "text": [
