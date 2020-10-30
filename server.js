@@ -13,13 +13,45 @@ server.get('/',(req,res)=>{
 server.post('/salud',(req,res)=>{
     let context;
     let result;
+    let opciones = [];
     try {
         context = req.body.queryResult.action;
         textoEnviar = `Recibida petición de acción: ${context}`;
         if(context=== "input.welcome"){            
-            textoEnviar = "Webhook response......";
-            result = dialog.webhookResponse(textoEnviar);
-        }
+            textoEnviar = "Hola! Soy tu asistente de salud";
+            result = dialog.respuestaInicial(textoEnviar, "¿Te puedo ayudar en algo?");
+        }else if(context === "sintomas_gripa"){
+            let fiebre ;
+            let tos;
+            let dolor_cabeza;
+            try {
+              tos = req.body.queryResult.parameters.tos
+              fiebre = req.body.queryResult.parameters.fiebre;
+              dolor_cabeza = req.body.queryResult.parameters.dolor_cabeza
+            } catch (error) {
+              console.log(error);
+            }
+            if(!tos){
+              textoEnviar = "¿Tienes tos?"
+              opciones = ["Si", "No"];
+              resultado = dialog.webhookResponse(textoEnviar)
+            }else if(!fiebre){
+              textoEnviar = "¿Tienes fiebre?"
+              opciones = ["Si", "No"];
+              result = dialog.webhookResponse(textoEnviar)
+            } else if(!dolor_cabeza){
+              textoEnviar = "¿Tienes dolor de cabeza?"
+              opciones = ["Si", "No"];
+              result = dialog.webhookResponse(textoEnviar)
+            } else{
+              if(dolor_cabeza !== "No" && fiebre !== "No" && tos !== "No"){
+                result = dialog.webhookResponse("Tienes gripa")
+              } else{
+                result = dialog.webhookResponse("Parece que no tienes gripa");
+              }              
+            }
+        
+          }
     } catch (error) {
         console.log("Error contexto vacio: ", error);
     }
