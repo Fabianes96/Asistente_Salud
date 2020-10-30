@@ -1,27 +1,27 @@
 function webhookResponse(text){
-    let res = {
-        "fulfillmentText": text,
-        "fulfillmentMessages": [
-          {
-            "platform": "ACTIONS_ON_GOOGLE",
-            "simpleResponses": {
-              "simpleResponses": [
-                {
-                  "textToSpeech": text
-                }
-              ]
+  let respuesta = {
+    "fulfillmentText": text,
+    "fulfillmentMessages": [
+      {
+        "platform": "ACTIONS_ON_GOOGLE",
+        "simpleResponses": {
+          "simpleResponses": [
+            {
+              "textToSpeech": text
             }
-          },      
-          {
-            "text": {
-              "text": [
-                text
-              ]
-            }
-          }
-        ]
-      };
-      return res; 
+          ]
+        }
+      },      
+      {
+        "text": {
+          "text": [
+            text
+          ]
+        }
+      }
+    ]
+  };
+  return respuesta; 
 }
 function respuestaInicial(texto1, texto2){
   let respuesta = {
