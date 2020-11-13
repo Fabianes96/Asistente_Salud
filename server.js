@@ -27,7 +27,7 @@ server.get("/", (req, res) => {
   return res.json("Asistente de Salud");
 });
 
-server.post("/salud",async (req, res) => {
+server.post("/salud", async (req, res) => {
   let context;
   let result;
   let opciones = [""];
@@ -35,60 +35,56 @@ server.post("/salud",async (req, res) => {
     context = req.body.queryResult.action;
     textoEnviar = `Recibida petición de acción: ${context}`;
     if (context === "input.welcome") {
-      try {        
-      let nombre = req.body.queryResult.parameters.nombre;;
-      let apellido = req.body.queryResult.parameters.apellido;;
-      let fecha_nac = req.body.queryResult.parameters.nacimiento;
-      let ced = req.body.queryResult.parameters.cedula
-      textoEnviar = "Hola! Soy tu asistente de salud";      
-      if(!ced){
-        result = dialog.respuestaInicial(
-          textoEnviar,
-          "Ingrese su cedula"
-        );    
-      } else{
-        var docRef = db.collection("users").doc(ced);        
-        await docRef.get().then((doc)=>{
-          if(doc.exists){
-            nombre = doc.data().name;
-            apellido = doc.data().lastname;
-            fecha_nac = doc.data().date;            
-            result = dialog.parameters(`Hola ${nombre}. En que te puedo ayudar?`,fecha_nac, nombre,apellido)
-          } else{            
-            // if(!nombre){
-            //   result = dialog.webhookResponse("Registrando usuario nuevo, ingrese su nombre"); 
-            // }else if(!apellido){
-            //   result = dialog.webhookResponse("Ingrese su apellido");              
-            // }else if(!fecha_nac){
-            //   result = dialog.webhookResponse("Ingrese su fecha de nacimiento");              
-            // }else{
-            //   result = dialog.webhookResponse("Usuario registrado");
-            // }
-            result = dialog.webhookResponse("Registrando nuevo usuario");
-          }
-        })        
-      }
+      try {
+        let nombre = req.body.queryResult.parameters.nombre;
+        let apellido = req.body.queryResult.parameters.apellido;
+        let fecha_nac = req.body.queryResult.parameters.nacimiento;
+        let ced = req.body.queryResult.parameters.cedula;
+        textoEnviar = "Hola! Soy tu asistente de salud";
+        if (!ced) {
+          result = dialog.respuestaInicial(textoEnviar, "Ingrese su cedula");
+        } else {
+          var docRef = db.collection("users").doc(ced);
+          await docRef.get().then((doc) => {
+            if (doc.exists) {
+              nombre = doc.data().name;
+              apellido = doc.data().lastname;
+              fecha_nac = doc.data().date;
+              result = dialog.parameters(
+                `Hola ${nombre}. En que te puedo ayudar?`,
+                fecha_nac,
+                nombre,
+                apellido
+              );
+            } else {              
+              result = dialog.webhookResponse(
+                "Registrando nuevo usuario. Por favor ingrese su nombre"
+              );
+            }
+          });
+        }
       } catch (error) {
         console.log(error);
-      }           
-      
-    } else if(context === "DefaultWelcomeIntent.DefaultWelcomeIntent-custom"){
+      }
+    } else if (context === "DefaultWelcomeIntent.DefaultWelcomeIntent-custom") {
       let nombre = req.body.queryResult.parameters.nombre;
       let apellido = req.body.queryResult.parameters.apellido;
       let fecha_nac = req.body.queryResult.parameters.nacimiento;
-      if(!nombre){
-              result = dialog.webhookResponse("Registrando usuario nuevo, ingrese su nombre"); 
-            }else if(!apellido){
-              result = dialog.webhookResponse("Ingrese su apellido");              
-            }else if(!fecha_nac){
-              result = dialog.webhookResponse("Ingrese su fecha de nacimiento");              
-            }else{
-              result = dialog.webhookResponse("Usuario registrado");
-            }
-    }else if (context === "sintoma") {
+      if (!nombre) {
+        result = dialog.webhookResponse(
+          "Registrando usuario nuevo, ingrese su nombre"
+        );
+      } else if (!apellido) {
+        result = dialog.webhookResponse("Ingrese su apellido");
+      } else if (!fecha_nac) {
+        result = dialog.webhookResponse("Ingrese su fecha de nacimiento");
+      } else {
+        result = dialog.webhookResponse("Usuario registrado");
+      }
+    } else if (context === "sintoma") {
       let ced;
       try {
-        ced = req.body.queryResult.parameters.cedula;        
+        ced = req.body.queryResult.parameters.cedula;
         if (!ced) {
           textoEnviar = "Por favor dicte su cédula";
           opciones = [""];
@@ -96,12 +92,15 @@ server.post("/salud",async (req, res) => {
         } else {
           var docRef = db.collection("users").doc(ced);
           await docRef.get().then((doc) => {
-            if (doc.exists) {              
-              textoEnviar = `Hola ${doc.data().name}. Vemos que sufres ${doc.data().enfermedad[0]}`
+            if (doc.exists) {
+              textoEnviar = `Hola ${doc.data().name}. Vemos que sufres ${
+                doc.data().enfermedad[0]
+              }`;
               result = dialog.webhookResponse(textoEnviar);
               console.log(result);
             } else {
-              textoEnviar = 'Registraremos el nuevo usuario. Cúal es tu nombre?'
+              textoEnviar =
+                "Registraremos el nuevo usuario. Cúal es tu nombre?";
               opciones = [""];
               result = dialog.webhookResponse(textoEnviar);
             }
@@ -111,10 +110,9 @@ server.post("/salud",async (req, res) => {
     }
   } catch (error) {
     console.log("Error de contexto vacio: ", error);
-  }  
+  }
   dialog.addOptions(result, opciones);
   res.json(result);
-  
 });
 
 server.listen(process.env.PORT || port, () => {
