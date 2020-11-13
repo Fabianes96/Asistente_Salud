@@ -65,6 +65,37 @@ function respuestaInicial(texto1, texto2){
   }
   return respuesta;
 }
+function parameters(text, nac, nom, ape){
+  let respuesta = {
+    "parameters":{
+      "nacimiento": nac,
+      "apellido": ape,
+      "nombre": nom
+    },
+    "fulfillmentText": text,
+    "fulfillmentMessages": [
+      {
+        "platform": "ACTIONS_ON_GOOGLE",
+        "simpleResponses": {
+          "simpleResponses": [
+            {
+              "textToSpeech": text
+            }
+          ]
+        }
+      },      
+      {
+        "text": {
+          "text": [
+            text
+          ]
+        }
+      }
+    ]
+  };
+  return respuesta; 
+
+}
 function addOptions(res,opciones){  
   res.fulfillmentMessages.push( {
     "platform": "ACTIONS_ON_GOOGLE",
@@ -83,5 +114,6 @@ function optionList(opciones){
 module.exports = {
   webhookResponse: webhookResponse,
   respuestaInicial: respuestaInicial,
-  addOptions: addOptions
+  addOptions: addOptions,
+  parameters: parameters
 };

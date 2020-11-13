@@ -53,7 +53,9 @@ server.post("/salud",async (req, res) => {
             nombre = doc.data().name;
             apellido = doc.data().lastname;
             fecha_nac = doc.data().date;
-            result = dialog.webhookResponse(`Hola ${nombre}. En qué te puedo ayudar?`);
+            
+            result = dialog.parameters(`Hola ${nombre}. En que te puedo ayudar?`,fecha_nac, nombre,apellido)
+
           } else{            
             if(!nombre){
               result = dialog.webhookResponse("Registrando usuario nuevo, ingrese su nombre"); 
