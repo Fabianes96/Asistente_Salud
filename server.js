@@ -52,12 +52,31 @@ server.post("/salud",async (req, res) => {
           if(doc.exists){
             nombre = doc.data().name;
             apellido = doc.data().lastname;
-            fecha_nac = doc.data().date;
-            
+            fecha_nac = doc.data().date;            
             result = dialog.parameters(`Hola ${nombre}. En que te puedo ayudar?`,fecha_nac, nombre,apellido)
-
           } else{            
-            if(!nombre){
+            // if(!nombre){
+            //   result = dialog.webhookResponse("Registrando usuario nuevo, ingrese su nombre"); 
+            // }else if(!apellido){
+            //   result = dialog.webhookResponse("Ingrese su apellido");              
+            // }else if(!fecha_nac){
+            //   result = dialog.webhookResponse("Ingrese su fecha de nacimiento");              
+            // }else{
+            //   result = dialog.webhookResponse("Usuario registrado");
+            // }
+            result = dialog.webhookResponse("Registrando nuevo usuario");
+          }
+        })        
+      }
+      } catch (error) {
+        console.log(error);
+      }           
+      
+    } else if(context === "DefaultWelcomeIntent.DefaultWelcomeIntent-custom"){
+      let nombre = req.body.queryResult.parameters.nombre;
+      let apellido = req.body.queryResult.parameters.apellido;
+      let fecha_nac = req.body.queryResult.parameters.nacimiento;
+      if(!nombre){
               result = dialog.webhookResponse("Registrando usuario nuevo, ingrese su nombre"); 
             }else if(!apellido){
               result = dialog.webhookResponse("Ingrese su apellido");              
@@ -66,14 +85,7 @@ server.post("/salud",async (req, res) => {
             }else{
               result = dialog.webhookResponse("Usuario registrado");
             }
-          }
-        })        
-      }
-      } catch (error) {
-        console.log(error);
-      }           
-      
-    } else if (context === "sintoma") {
+    }else if (context === "sintoma") {
       let ced;
       try {
         ced = req.body.queryResult.parameters.cedula;        
