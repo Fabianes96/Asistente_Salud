@@ -30,15 +30,15 @@ server.get("/", (req, res) => {
 server.post("/salud",async (req, res) => {
   let context;
   let result;
-  let opciones = ["Prueba"];
+  let opciones = [""];
   try {
     context = req.body.queryResult.action;
     textoEnviar = `Recibida petición de acción: ${context}`;
     if (context === "input.welcome") {
       try {        
-      let nombre;
-      let apellido;
-      let fecha_nac;
+      let nombre = req.body.queryResult.parameters.nombre;;
+      let apellido = req.body.queryResult.parameters.apellido;;
+      let fecha_nac = req.body.queryResult.parameters.nacimiento;
       let ced = req.body.queryResult.parameters.cedula
       textoEnviar = "Hola! Soy tu asistente de salud";      
       if(!ced){
@@ -56,14 +56,11 @@ server.post("/salud",async (req, res) => {
             result = dialog.webhookResponse(`Hola ${nombre}. En qué te puedo ayudar?`);
           } else{            
             if(!nombre){
-              result = dialog.webhookResponse("Registrando usuario nuevo, ingrese su nombre");
-              nombre = req.body.queryResult.parameters.nombre;
+              result = dialog.webhookResponse("Registrando usuario nuevo, ingrese su nombre"); 
             }else if(!apellido){
-              result = dialog.webhookResponse("Ingrese su apellido");
-              apellido = req.body.queryResult.parameters.apellido;
+              result = dialog.webhookResponse("Ingrese su apellido");              
             }else if(!fecha_nac){
-              result = dialog.webhookResponse("Ingrese su fecha de nacimiento");
-              fecha_nac = req.body.queryResult.parameters.nacimiento;
+              result = dialog.webhookResponse("Ingrese su fecha de nacimiento");              
             }else{
               result = dialog.webhookResponse("Usuario registrado");
             }
@@ -71,39 +68,9 @@ server.post("/salud",async (req, res) => {
         })        
       }
       } catch (error) {
-        console.log("Error en la falla");
-      }      
+        console.log(error);
+      }           
       
-      // }else if(context === "sintomas_gripa"){
-      //     let fiebre ;
-      //     let tos;
-      //     let dolor_cabeza;
-      //     try {
-      //       tos = req.body.queryResult.parameters.tos
-      //       fiebre = req.body.queryResult.parameters.fiebre;
-      //       dolor_cabeza = req.body.queryResult.parameters.dolor_cabeza
-      //     } catch (error) {
-      //       console.log(error);
-      //     }
-      //     if(!tos){
-      //       textoEnviar = "¿Tienes tos?"
-      //       opciones = ["Si", "No"];
-      //       result = dialog.webhookResponse(textoEnviar)
-      //     }else if(!fiebre){
-      //       textoEnviar = "¿Tienes fiebre?"
-      //       opciones = ["Si", "No"];
-      //       result = dialog.webhookResponse(textoEnviar)
-      //     } else if(!dolor_cabeza){
-      //       textoEnviar = "¿Tienes dolor de cabeza?"
-      //       opciones = ["Si", "No"];
-      //       result = dialog.webhookResponse(textoEnviar)
-      //     } else{
-      //       if(dolor_cabeza !== "No" && fiebre !== "No" && tos !== "No"){
-      //         result = dialog.webhookResponse("Tienes gripa")
-      //       } else{
-      //         result = dialog.webhookResponse("Parece que no tienes gripa");
-      //       }
-      //     }
     } else if (context === "sintoma") {
       let ced;
       try {
@@ -130,8 +97,7 @@ server.post("/salud",async (req, res) => {
     }
   } catch (error) {
     console.log("Error de contexto vacio: ", error);
-  }
-  console.log(result, opciones);
+  }  
   dialog.addOptions(result, opciones);
   res.json(result);
   
