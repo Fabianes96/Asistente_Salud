@@ -35,11 +35,45 @@ server.post("/salud",async (req, res) => {
     context = req.body.queryResult.action;
     textoEnviar = `Recibida petición de acción: ${context}`;
     if (context === "input.welcome") {
-      textoEnviar = "Hola! Soy tu asistente de salud";
-      result = dialog.respuestaInicial(
-        textoEnviar,
-        "¿Te puedo ayudar en algo?"
-      );
+      try {        
+      let nombre;
+      let apellido;
+      let fecha_nac;
+      let ced = req.body.queryResult.parameters.cedula
+      textoEnviar = "Hola! Soy tu asistente de salud";      
+      if(!ced){
+        result = dialog.respuestaInicial(
+          textoEnviar,
+          "Ingrese su cedula"
+        );    
+      } else{
+        var docRef = db.collection("users").doc(ced);        
+        await docRef.get().then((doc)=>{
+          if(doc.exists){
+            nombre = doc.data().name;
+            apellido = doc.data().lastname;
+            fecha_nac = doc.data().date;
+            result = dialog.webhookResponse(`Hola ${nombre}. En qué te puedo ayudar?`);
+          } else{            
+            if(!nombre){
+              result = dialog.webhookResponse("Registrando usuario nuevo, ingrese su nombre");
+              nombre = req.body.queryResult.parameters.nombre;
+            }else if(!apellido){
+              result = dialog.webhookResponse("Ingrese su apellido");
+              apellido = req.body.queryResult.parameters.apellido;
+            }else if(!fecha_nac){
+              result = dialog.webhookResponse("Ingrese su fecha de nacimiento");
+              fecha_nac = req.body.queryResult.parameters.nacimiento;
+            }else{
+              result = dialog.webhookResponse("Usuario registrado");
+            }
+          }
+        })        
+      }
+      } catch (error) {
+        console.log("Error en la falla");
+      }      
+      
       // }else if(context === "sintomas_gripa"){
       //     let fiebre ;
       //     let tos;
@@ -73,10 +107,7 @@ server.post("/salud",async (req, res) => {
     } else if (context === "sintoma") {
       let ced;
       try {
-        ced = req.body.queryResult.parameters.cedula;
-        let nombre;
-        let apellido;
-        let fecha_nac;
+        ced = req.body.queryResult.parameters.cedula;        
         if (!ced) {
           textoEnviar = "Por favor dicte su cédula";
           opciones = [""];
