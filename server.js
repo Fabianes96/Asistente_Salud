@@ -34,28 +34,35 @@ server.post("/salud", async (req, res) => {
         let ced = req.body.queryResult.parameters.cedula;        
         textoEnviar = "Hola! Soy tu asistente de salud";
         if (!ced) {
-          result = dialog.respuestaInicial(textoEnviar, "Ingrese su cedula");
+          result = dialog.respuestaInicial(textoEnviar, "Ingrese su cédula");
         } else {
-          cedGlobal = ced
-          var docRef = db.collection(collection).doc(ced);
-          await docRef.get().then((doc) => {
-            if (doc.exists) {
-              nombre = doc.data().name;
-              apellido = doc.data().lastname;
-              fecha_nac = doc.data().date;
-              result = dialog.parameters(
-                `Hola ${nombre}. En que te puedo ayudar?`,
-                fecha_nac,
-                nombre,
-                apellido
-              );
-            } else {           
-              
+          try {
+            cedGlobal = ced
+            var docRef = db.collection(collection).doc(ced);
+            await docRef.get().then((doc) => {
+              if (doc.exists) {
+                nombre = doc.data().name;
+                apellido = doc.data().lastname;
+                fecha_nac = doc.data().date;
+                result = dialog.parameters(
+                  `Hola ${nombre}. En qué te puedo ayudar?`,
+                  fecha_nac,
+                  nombre,
+                  apellido
+                );
+                
+              } else {                         
+                result = dialog.webhookResponse(
+                  "Registrando nuevo usuario. Por favor ingrese su nombre"
+                );
+              }
+            });            
+          } catch (error) {
+              console.log(error);
               result = dialog.webhookResponse(
-                "Registrando nuevo usuario. Por favor ingrese su nombre"
+                "Ocurrió un error inesperado. Por favor intente mas tarde"
               );
-            }
-          });
+          }
         }
       } catch (error) {
         console.log(error);
@@ -78,37 +85,21 @@ server.post("/salud", async (req, res) => {
         user.lastname = apellido;
         user.date = fecha_nac;        
         firestoreService.addUser(user)
+        opciones = ["Me siento mal"]
         result = dialog.webhookResponse("Usuario registrado");
+      }    
+    }else if (context === "sintomas"){
+      let sintomas = req.body.queryResult.parameters.sintomas;      
+      if(!sintomas){
+        result = dialog.webhookResponse("Indícame cuales son tus sintomas");
+      } else{
+        user.sintomas = sintomas;
+        firestoreService.updateUser({sintomas:sintomas},cedGlobal)        
+        result = dialog.webhookResponse("Tenemos tus datos. Vamos a comunicarlo a un médico");
       }
-    // } else if (context === "sintoma") {
-    //   let ced;
-    //   try {
-    //     ced = req.body.queryResult.parameters.cedula;
-    //     if (!ced) {
-    //       textoEnviar = "Por favor dicte su cédula";
-    //       opciones = [""];
-    //       result = dialog.webhookResponse(textoEnviar);
-    //     } else {
-    //       var docRef = db.collection("users").doc(ced);
-    //       await docRef.get().then((doc) => {
-    //         if (doc.exists) {
-    //           textoEnviar = `Hola ${doc.data().name}. Vemos que sufres ${
-    //             doc.data().enfermedad[0]
-    //           }`;
-    //           result = dialog.webhookResponse(textoEnviar);
-    //           console.log(result);
-    //         } else {              
-    //           textoEnviar =
-    //             "Registraremos el nuevo usuario. Cúal es tu nombre?";
-    //           opciones = [""];
-    //           result = dialog.webhookResponse(textoEnviar);
-    //         }
-    //       });
-    //     }
-    //   } catch (error) {}
     }
   } catch (error) {
-    console.log("Error de contexto vacio: ", error);
+    console.log(error);
   }
   dialog.addOptions(result, opciones);
   res.json(result);

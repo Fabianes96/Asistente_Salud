@@ -23,5 +23,9 @@ function addUser(user){
     .catch((error)=> console.log("Error inesperado",error))
     return output
 }
+function updateUser(data, id){
+    var ref = db.collection(collection).doc(id);
+    ref.set(data,{merge:true})
+}
 
-module.exports = {addUser:addUser, db:db};
+module.exports = {addUser:addUser, db:db, updateUser: updateUser};
