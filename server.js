@@ -79,14 +79,15 @@ server.post("/salud", async (req, res) => {
         result = dialog.webhookResponse("Ingrese su apellido");
       } else if (!fecha_nac) {
         result = dialog.webhookResponse("Ingrese su fecha de nacimiento");
-      } else {
-        result = dialog.webhookResponse("Usuario registrado");
-        opciones = ["Me siento mal"]
+      } else {        
         user.cc = cedGlobal
         user.name = nombre;
         user.lastname = apellido;
-        user.date = fecha_nac;        
-        await firestoreService.addUser(user);
+        user.date = fecha_nac;   
+        user.sintomas = "";        
+        firestoreService.addUser(user);
+        result = dialog.webhookResponse("Usuario registrado");
+        opciones = ["Me siento mal"]
       }    
     }else if (context === "sintomas"){
       let sintomas = req.body.queryResult.parameters.sintomas;      
@@ -94,7 +95,7 @@ server.post("/salud", async (req, res) => {
         result = dialog.webhookResponse("Indícame cuales son tus sintomas");
       } else{
         user.sintomas = sintomas;
-        firestoreService.updateUser({sintomas:sintomas},cedGlobal)        
+        firestoreService.updateUser({sintomas:sintomas},cedGlobal)      
         result = dialog.webhookResponse("Tenemos tus datos. Vamos a comunicarlo a un médico");
       }
     }
