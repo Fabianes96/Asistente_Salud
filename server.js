@@ -84,7 +84,7 @@ server.post("/salud", async (req, res) => {
         user.name = nombre;
         user.lastname = apellido;
         user.date = fecha_nac;        
-        firestoreService.addUser(user)
+        await firestoreService.addUser(user);
         opciones = ["Me siento mal"]
         result = dialog.webhookResponse("Usuario registrado");
       }    
