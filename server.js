@@ -80,13 +80,13 @@ server.post("/salud", async (req, res) => {
       } else if (!fecha_nac) {
         result = dialog.webhookResponse("Ingrese su fecha de nacimiento");
       } else {
+        result = dialog.webhookResponse("Usuario registrado");
+        opciones = ["Me siento mal"]
         user.cc = cedGlobal
         user.name = nombre;
         user.lastname = apellido;
         user.date = fecha_nac;        
         await firestoreService.addUser(user);
-        opciones = ["Me siento mal"]
-        result = dialog.webhookResponse("Usuario registrado");
       }    
     }else if (context === "sintomas"){
       let sintomas = req.body.queryResult.parameters.sintomas;      
