@@ -45,16 +45,17 @@ server.post("/salud", async (req, res) => {
                 apellido = doc.data().lastname;
                 fecha_nac = doc.data().date;
                 result = dialog.parameters(
-                  `Hola ${nombre}. En qué te puedo ayudar?`,
+                  `Hola ${nombre}. Si tienes problemas de salud responde: 'Me siento mal'`,
                   fecha_nac,
                   nombre,
                   apellido
                 );
-                
+                opciones = ["Me siento mal", "Salir"]
               } else {                         
                 result = dialog.webhookResponse(
                   "Registrando nuevo usuario. Por favor ingrese su nombre"
                 );
+                opciones = ["Salir"]
               }
             });            
           } catch (error) {
@@ -75,10 +76,13 @@ server.post("/salud", async (req, res) => {
         result = dialog.webhookResponse(
           "Registrando usuario nuevo, ingrese su nombre"
         );
+        opciones = ["Salir"]
       } else if (!apellido) {
         result = dialog.webhookResponse("Ingrese su apellido");
+        opciones = ["Salir"]
       } else if (!fecha_nac) {
         result = dialog.webhookResponse("Ingrese su fecha de nacimiento");
+        opciones = ["Salir"]
       } else {        
         user.cc = cedGlobal
         user.name = nombre;
@@ -87,16 +91,18 @@ server.post("/salud", async (req, res) => {
         user.sintomas = "";        
         firestoreService.addUser(user);
         result = dialog.webhookResponse("Usuario registrado");
-        opciones = ["Me siento mal"]
+        opciones = ["Me siento mal", "Salir"]
       }    
     }else if (context === "sintomas"){
       let sintomas = req.body.queryResult.parameters.sintomas;      
       if(!sintomas){
         result = dialog.webhookResponse("Indícame cuales son tus sintomas");
+        opciones = ["Salir"]
       } else{
         user.sintomas = sintomas;
         firestoreService.updateUser({sintomas:sintomas},cedGlobal)      
         result = dialog.webhookResponse("Tenemos tus datos. Vamos a comunicarlo a un médico");
+        opciones = ["Salir"]
       }
     }
   } catch (error) {
